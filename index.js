@@ -1,7 +1,6 @@
 import React from 'react-native';
 const {
   PixelRatio,
-  StatusBarIOS,
   Component,
   Text,
   View,
@@ -21,33 +20,7 @@ const TitleShape = {
   tintColor: PropTypes.string,
 };
 
-const StatusBarShape = {
-  style: PropTypes.oneOf(['light-content', 'default', ]),
-  hidden: PropTypes.bool,
-  tintColor: PropTypes.string,
-  hideAnimation: PropTypes.oneOf(['fade', 'slide', 'none', ]),
-  showAnimation: PropTypes.oneOf(['fade', 'slide', 'none', ])
-};
-
-function customizeStatusBar(data) {
-  if (data.style) {
-    StatusBarIOS.setStyle(data.style, true);
-  }
-  const animation = data.hidden ?
-    (data.hideAnimation || NavigationBar.defaultProps.statusBar.hideAnimation) :
-    (data.showAnimation || NavigationBar.defaultProps.statusBar.showAnimation);
-
-  StatusBarIOS.setHidden(data.hidden, animation);
-}
-
 export default class NavigationBar extends Component {
-  componentDidMount() {
-    customizeStatusBar(this.props.statusBar);
-  }
-
-  componentWillReceiveProps(props) {
-    customizeStatusBar(this.props.statusBar);
-  }
 
   getButtonElement(data = {}, style) {
     if (data._isReactElement) {
@@ -101,7 +74,6 @@ export default class NavigationBar extends Component {
       PropTypes.array,
     ]),
     tintColor: PropTypes.string,
-    statusBar: PropTypes.shape(StatusBarShape),
     leftButton: PropTypes.oneOfType([
       PropTypes.shape(ButtonShape),
       PropTypes.element,
