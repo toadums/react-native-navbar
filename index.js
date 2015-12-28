@@ -4,7 +4,7 @@ const {
   Component,
   Text,
   View,
-  PropTypes
+  PropTypes,
 } = React;
 import NavbarButton from './NavbarButton';
 import styles from './styles';
@@ -20,11 +20,37 @@ const TitleShape = {
   tintColor: PropTypes.string,
 };
 
-export default class NavigationBar extends Component {
+const StatusBarShape = {
+  style: PropTypes.oneOf(['light-content', 'default', ]),
+  hidden: PropTypes.bool,
+  tintColor: PropTypes.string,
+  hideAnimation: PropTypes.oneOf(['fade', 'slide', 'none', ]),
+  showAnimation: PropTypes.oneOf(['fade', 'slide', 'none', ]),
+};
+
+function customizeStatusBar(data) {
+  if (data.style) {
+    StatusBarIOS.setStyle(data.style, true);
+  }
+  const animation = data.hidden ?
+    (data.hideAnimation || NavigationBar.defaultProps.statusBar.hideAnimation) :
+    (data.showAnimation || NavigationBar.defaultProps.statusBar.showAnimation);
+
+  StatusBarIOS.setHidden(data.hidden, animation);
+}
+
+module.exports = class NavigationBar extends Component {
+  componentDidMount() {
+    customizeStatusBar(this.props.statusBar);
+  }
+
+  componentWillReceiveProps(props) {
+    customizeStatusBar(this.props.statusBar);
+  }
 
   getButtonElement(data = {}, style) {
-    if (data._isReactElement) {
-      return data;
+    if (!!data.props) {
+      return <View style={styles.navBarButton}>{data}</View>;
     }
 
     return <NavbarButton
@@ -35,7 +61,7 @@ export default class NavigationBar extends Component {
   }
 
   getTitleElement(data) {
-    if (data._isReactElement) {
+    if (!!data.props) {
       return <View style={styles.customTitle}>{data}</View>;
     }
 
@@ -51,7 +77,7 @@ export default class NavigationBar extends Component {
 
   render() {
     const customTintColor = this.props.tintColor ?
-      { backgroundColor: this.props.tintColor } : null;
+      { backgroundColor: this.props.tintColor, } : null;
 
     const statusBar = !this.props.statusBar.hidden ?
       <View style={[styles.statusBar, ]} /> : null;
@@ -69,10 +95,6 @@ export default class NavigationBar extends Component {
   }
 
   static propTypes = {
-    style: PropTypes.oneOfType([
-      PropTypes.object,
-      PropTypes.array,
-    ]),
     tintColor: PropTypes.string,
     leftButton: PropTypes.oneOfType([
       PropTypes.shape(ButtonShape),
@@ -99,4 +121,4 @@ export default class NavigationBar extends Component {
       title: '',
     },
   }
-}
+};
